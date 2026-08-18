@@ -1,0 +1,81 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+
+data = {
+    "Annual_Income": [
+        25000, 30000, 35000, 40000, 45000,
+        50000, 55000, 60000, 65000, 70000,
+        75000, 80000, 85000, 90000, 95000
+    ],
+    "Outstanding_Debt": [
+        18000, 16000, 15000, 13000, 12000,
+        10000, 9000, 8000, 7000, 6000,
+        5000, 4500, 4000, 3000, 2000
+    ],
+    "Credit_Utilization": [
+        80, 75, 70, 65, 60,
+        55, 50, 45, 40, 35,
+        30, 25, 20, 15, 10
+    ],
+    "Payment_Delay": [
+        25, 22, 20, 18, 15,
+        12, 10, 8, 6, 5,
+        4, 3, 2, 1, 0
+    ],
+    "Credit_Score": [
+        "Poor", "Poor", "Poor", "Poor", "Poor",
+        "Standard", "Standard", "Standard", "Standard", "Standard",
+        "Good", "Good", "Good", "Good", "Good"
+    ]
+}
+
+df = pd.DataFrame(data)
+
+print("Dataset:")
+print(df)
+
+X = df.drop("Credit_Score", axis=1)
+y = df["Credit_Score"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.3,
+    random_state=42,
+    stratify=y
+)
+
+model = RandomForestClassifier(
+    n_estimators=100,
+    random_state=42
+)
+
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+print("\nActual Values:")
+print(y_test.values)
+
+print("\nPredicted Values:")
+print(y_pred)
+
+print("\nAccuracy:")
+print(accuracy_score(y_test, y_pred))
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, zero_division=0))
+
+new_person = pd.DataFrame([{
+    "Annual_Income": 72000,
+    "Outstanding_Debt": 5000,
+    "Credit_Utilization": 28,
+    "Payment_Delay": 3
+}])
+
+prediction = model.predict(new_person)
+
+print("\nNew Customer Credit Score:", prediction[0])
+print("Yash Sharma (192525150)")
