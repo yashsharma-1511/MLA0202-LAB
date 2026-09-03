@@ -1,0 +1,92 @@
+# YASH SHARMA
+
+import pandas as pd
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# Load dataset
+data = pd.read_csv("bank_loan.csv")
+
+# Display dataset
+print(data.head())
+
+# Encode categorical columns
+encoder = LabelEncoder()
+
+categorical_columns = [
+    "Gender",
+    "Married",
+    "Education",
+    "Loan_Status"
+]
+
+for column in categorical_columns:
+    data[column] = encoder.fit_transform(data[column].astype(str))
+
+# Features
+X = data[
+    [
+        "Gender",
+        "Married",
+        "Education",
+        "ApplicantIncome",
+        "LoanAmount",
+        "Credit_History"
+    ]
+]
+
+# Target
+y = data["Loan_Status"]
+
+# Handle missing values
+X = X.fillna(X.mean())
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+# Create Naive Bayes model
+model = GaussianNB()
+
+# Train
+model.fit(X_train, y_train)
+
+# Prediction
+y_pred = model.predict(X_test)
+
+# Evaluation
+print("\nBank Loan Prediction")
+print("--------------------")
+
+print("Accuracy:",
+      accuracy_score(y_test, y_pred))
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+# Predict new applicant
+new_applicant = [[
+    1,      # Gender
+    1,      # Married
+    0,      # Education
+    5000,   # Applicant Income
+    150,    # Loan Amount
+    1       # Credit History
+]]
+
+prediction = model.predict(new_applicant)
+
+if prediction[0] == 1:
+    print("\nLoan Prediction: APPROVED")
+else:
+    print("\nLoan Prediction: NOT APPROVED")
